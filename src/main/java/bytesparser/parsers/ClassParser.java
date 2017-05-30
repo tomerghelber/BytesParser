@@ -1,33 +1,33 @@
 package bytesparser.parsers;
 
-import bytesparser.Context;
+import bits.array.BitArray;
+import bytesparser.contexts.AbstractContext;
+import bytesparser.contexts.BytesContext;
+import bytesparser.contexts.Context;
 import bytesparser.valuegetters.ValueGetter;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import javafx.util.Pair;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * @author tomer
  * @since 5/29/17
  */
 @RequiredArgsConstructor
-public class ClassParser<T> implements Parser<T> {
+public class ClassParser<T> implements Parser<BitArray, T> {
 
-    private final ValueGetter<T> builder;
+    private final ValueGetter<BitArray, T> builder;
 
     private final List<Pair<String, Parser>> fields;
 
     @Override
-    public T parse(Context context) {
+    public T parse(Context<BitArray> context) {
         Map<String, Object> fieldsValues = Maps.newHashMap();
         for (Pair<String, Parser> fieldParser: fields) {
             String fieldName = fieldParser.getKey();
@@ -49,5 +49,10 @@ public class ClassParser<T> implements Parser<T> {
             }
         }
         return t;
+    }
+
+    @Override
+    public T parse(byte[] source) {
+        return parse(new BytesContext<T>(source));
     }
 }

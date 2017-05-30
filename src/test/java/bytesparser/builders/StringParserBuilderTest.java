@@ -1,5 +1,6 @@
 package bytesparser.builders;
 
+import bits.array.BitArray;
 import bytesparser.Shortcuts;
 import bytesparser.parsers.Parser;
 import com.google.common.base.Charsets;
@@ -19,8 +20,7 @@ class StringParserBuilderTest {
     @DisplayName("Test simple string creation")
     void testSimpleStringCreation() throws Exception {
         byte[] example = {'h', 'e', 'l', 'l', 'o'};
-        Parser<String> parser = Shortcuts.string().build();
-        String actual = parser.parse(example);
+        String actual = Shortcuts.string().build().parse(example);
         String expected = "hello";
         assertEquals(actual, expected);
     }

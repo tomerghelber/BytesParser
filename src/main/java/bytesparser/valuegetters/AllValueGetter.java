@@ -1,13 +1,12 @@
 package bytesparser.valuegetters;
 
-import bytesparser.Context;
-import lombok.RequiredArgsConstructor;
+import bytesparser.contexts.Context;
 
 /**
  * @author tomer
  * @since 5/29/17
  */
-public class AllValueGetter implements ValueGetter<Integer> {
+public class AllValueGetter<S> implements ValueGetter<S, Integer> {
 
     @Override
     public Integer get(Context context) {

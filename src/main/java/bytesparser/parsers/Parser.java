@@ -1,15 +1,11 @@
 package bytesparser.parsers;
 
-import bytesparser.Context;
+import bytesparser.contexts.Context;
 
 /**
  * Created by tomer on 4/20/17.
  */
-@FunctionalInterface
-public interface Parser<T> {
-    T parse(Context context);
-
-    default T parse(byte[] source) {
-        return parse(new Context(source));
-    }
+public interface Parser<S, T> {
+    T parse(Context<S> context);
+    T parse(byte[] source);
 }

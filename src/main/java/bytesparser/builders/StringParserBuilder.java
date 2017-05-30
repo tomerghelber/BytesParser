@@ -1,5 +1,6 @@
 package bytesparser.builders;
 
+import bits.array.BitArray;
 import bytesparser.parsers.Parser;
 import bytesparser.parsers.StringParser;
 import bytesparser.valuegetters.AllValueGetter;
@@ -12,14 +13,14 @@ import java.nio.charset.Charset;
  * @author tomer
  * @since 5/29/17
  */
-public class StringParserBuilder implements ParserBuilder<String> {
+public class StringParserBuilder implements ParserBuilder<BitArray, String> {
 
-    private ValueGetter<Integer> offsetGetter = context -> 0;
-    private ValueGetter<Integer> lengthGetter = new AllValueGetter();
-    private ValueGetter<Charset> charsetGetter = context -> Charsets.UTF_8;
+    private ValueGetter<BitArray, Integer> offsetGetter = context -> 0;
+    private ValueGetter<BitArray, Integer> lengthGetter = new AllValueGetter<>();
+    private ValueGetter<BitArray, Charset> charsetGetter = context -> Charsets.UTF_8;
 
     @Override
-    public Parser<String> build() {
+    public Parser<BitArray, String> build() {
         return new StringParser(offsetGetter, lengthGetter, charsetGetter);
     }
 
@@ -27,7 +28,7 @@ public class StringParserBuilder implements ParserBuilder<String> {
         return setLength((context) -> length);
     }
 
-    public StringParserBuilder setLength(ValueGetter<Integer> lengthGetter) {
+    public StringParserBuilder setLength(ValueGetter<BitArray, Integer> lengthGetter) {
         this.lengthGetter  = lengthGetter;
         return this;
     }
@@ -36,7 +37,7 @@ public class StringParserBuilder implements ParserBuilder<String> {
         return setOffset((context) -> offset);
     }
 
-    public StringParserBuilder setOffset(ValueGetter<Integer> offsetGetter) {
+    public StringParserBuilder setOffset(ValueGetter<BitArray, Integer> offsetGetter) {
         this.offsetGetter  = offsetGetter;
         return this;
     }
@@ -50,7 +51,7 @@ public class StringParserBuilder implements ParserBuilder<String> {
         return setCharset((context) -> charset);
     }
 
-    public StringParserBuilder setCharset(ValueGetter<Charset> charsetGetter) {
+    public StringParserBuilder setCharset(ValueGetter<BitArray, Charset> charsetGetter) {
         this.charsetGetter  = charsetGetter;
         return this;
     }

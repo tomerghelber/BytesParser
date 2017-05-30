@@ -1,13 +1,13 @@
 package bytesparser.parsers;
 
-import bytesparser.Context;
+import bits.array.BitArray;
+import bytesparser.contexts.AbstractContext;
+import bytesparser.contexts.BytesContext;
+import bytesparser.contexts.Context;
 import bytesparser.valuegetters.ValueGetter;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 /**
  * @author tomer
@@ -15,13 +15,13 @@ import java.nio.charset.Charset;
  */
 @Builder
 @RequiredArgsConstructor
-public class IntegerParser implements Parser<Integer> {
+public class IntegerParser implements Parser<BitArray, Integer> {
 
     @NonNull
-    private final ValueGetter<Integer> sizeGetter;
+    private final ValueGetter<BitArray, Integer> sizeGetter;
 
     @Override
-    public Integer parse(Context context) {
+    public Integer parse(Context<BitArray> context) {
         int size = sizeGetter.get(context);
         byte[] source = context.getData(size * Byte.SIZE).toBytes();
         int value = 0;
@@ -30,5 +30,10 @@ public class IntegerParser implements Parser<Integer> {
             value += source[i];
         }
         return value;
+    }
+
+    @Override
+    public Integer parse(byte[] source) {
+        return parse(new BytesContext<>(source));
     }
 }

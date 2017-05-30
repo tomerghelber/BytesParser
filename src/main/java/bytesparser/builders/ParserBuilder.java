@@ -7,6 +7,6 @@ import bytesparser.parsers.Parser;
  * @since 5/29/17
  */
 @FunctionalInterface
-public interface ParserBuilder<T> {
-    Parser<T> build();
+public interface ParserBuilder<S, T> {
+    Parser<S, T> build();
 }

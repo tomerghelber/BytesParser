@@ -1,5 +1,6 @@
 package bytesparser.builders;
 
+import bits.array.BitArray;
 import bytesparser.parsers.IntegerParser;
 import bytesparser.parsers.Parser;
 import bytesparser.parsers.StringParser;
@@ -14,9 +15,9 @@ import java.nio.charset.Charset;
  * @author tomer
  * @since 5/29/17
  */
-public class IntegerParserBuilder implements ParserBuilder<Integer> {
+public class IntegerParserBuilder implements ParserBuilder<BitArray, Integer> {
 
-    private ValueGetter<Integer> sizeGetter = new AllValueGetter();
+    private ValueGetter<BitArray, Integer> sizeGetter = new AllValueGetter<>();
 
     @Override
     public IntegerParser build() {
@@ -27,7 +28,7 @@ public class IntegerParserBuilder implements ParserBuilder<Integer> {
         return size(context -> i);
     }
 
-    public IntegerParserBuilder size(ValueGetter<Integer> sizeGetter) {
+    public IntegerParserBuilder size(ValueGetter<BitArray, Integer> sizeGetter) {
         this.sizeGetter = sizeGetter;
         return this;
     }

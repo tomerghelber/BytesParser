@@ -1,30 +1,33 @@
-package bytesparser;
+package bytesparser.contexts;
 
 import bits.array.BitArray;
 import bits.array.simples.BytesAsBitArray;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static lombok.AccessLevel.PROTECTED;
+
 /**
  * Created by tomer on 4/20/17.
  */
-public class Context {
+public abstract class AbstractContext<S> implements Context<S> {
 
     /* --- Members --- */
 
     private final Map<String, Object> fields = new HashMap<>();
 
-    private BitArray source;
+    @Setter(value = PROTECTED)
+    @Getter(value = PROTECTED)
+    private S source;
 
     /* --- Constructors --- */
 
-    public Context(byte[] source) {
-        this(new BytesAsBitArray(source));
-    }
-
-    public Context(BitArray source) {
+    public AbstractContext(S source) {
         this.source = source;
     }
 
@@ -41,13 +44,7 @@ public class Context {
         fields.put(fieldName, fieldValue);
     }
 
-    public BitArray getData(int size) {
-        BitArray ret = source.cut(size);
-        source = source.cut(size, source.size());
-        return ret;
-    }
+    public abstract S getData(int size);
 
-    public int getRemand() {
-        return source.size();
-    }
+    public abstract int getRemand();
 }

@@ -1,5 +1,6 @@
 package bytesparser.builders;
 
+import bits.array.BitArray;
 import bytesparser.parsers.ClassParser;
 import bytesparser.parsers.Parser;
 import bytesparser.valuegetters.ValueGetter;
@@ -12,9 +13,9 @@ import java.util.List;
  * @author tomer
  * @since 5/30/17
  */
-public class ClassParserBuilder<T> implements ParserBuilder<T> {
+public class ClassParserBuilder<T> implements ParserBuilder<BitArray, T> {
 
-    ValueGetter<T> builder=null;
+    ValueGetter<BitArray, T> builder=null;
     List<Pair<String, Parser>> fields = Lists.newArrayListWithCapacity(5);
 
     @Override
@@ -22,7 +23,7 @@ public class ClassParserBuilder<T> implements ParserBuilder<T> {
         return new ClassParser<>(builder, fields);
     }
 
-    public ClassParserBuilder setBuilder(ValueGetter<T> builder) {
+    public ClassParserBuilder setBuilder(ValueGetter<BitArray, T> builder) {
         this.builder = builder;
         return this;
     }
