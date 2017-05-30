@@ -1,12 +1,17 @@
 package bytesparser.parsers;
 
+import bits.array.BitArray;
 import bytesparser.Shortcuts;
-import bytesparser.builders.ClassParserBuilder;
+import bytesparser.valuegetters.ValueGetter;
+import com.google.common.collect.Lists;
+import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,10 +27,10 @@ class ClassParserTest {
         class ExampleClass {
 
         }
-        ClassParserBuilder<ExampleClass> parserBuilder = Shortcuts.classParser();
-        parserBuilder.setBuilder((context)->new ExampleClass());
+        ValueGetter<BitArray, ExampleClass> builder = (array)->new ExampleClass();
+        List<Pair<String, Parser>> fields = Lists.newArrayList();
+        ClassParser<ExampleClass> parser = new ClassParser<>(builder, fields);
 
-        ClassParser<ExampleClass> parser = parserBuilder.build();
         ExampleClass actual = parser.parse(new byte[0]);
         assertNotNull(actual);
     }
@@ -39,11 +44,12 @@ class ClassParserTest {
             @Getter
             private String field1;
         }
-        ClassParserBuilder<ExampleClass> parserBuilder = Shortcuts.classParser();
-        parserBuilder.setBuilder((context)->new ExampleClass());
-        parserBuilder.addField("field1", Shortcuts.string().build());
+        ValueGetter<BitArray, ExampleClass> builder = (array)->new ExampleClass();
+        List<Pair<String, Parser>> fields = Lists.newArrayList(
+                new Pair<>("field1", Shortcuts.string().build())
+        );
+        ClassParser<ExampleClass> parser = new ClassParser<>(builder, fields);
 
-        ClassParser<ExampleClass> parser = parserBuilder.build();
         ExampleClass actual = parser.parse("testing field1".getBytes());
 
         ExampleClass expected = new ExampleClass("testing field1");
@@ -59,12 +65,13 @@ class ClassParserTest {
             @Getter
             private String field1;
         }
-        ClassParserBuilder<ExampleClass> parserBuilder = Shortcuts.classParser();
-        parserBuilder.setBuilder((context)->new ExampleClass());
-        parserBuilder.addField("field1Size", Shortcuts.integer().size(1).build());
-        parserBuilder.addField("field1", Shortcuts.string().setLength((context -> context.getField("field1Size"))).build());
+        ValueGetter<BitArray, ExampleClass> builder = (array)->new ExampleClass();
+        List<Pair<String, Parser>> fields = Lists.newArrayList(
+                new Pair<>("field1Size", Shortcuts.integer().size(1).build()),
+                new Pair<>("field1", Shortcuts.string().setLength((context -> context.getField("field1Size"))).build())
+        );
+        ClassParser<ExampleClass> parser = new ClassParser<>(builder, fields);
 
-        ClassParser<ExampleClass> parser = parserBuilder.build();
         ExampleClass actual = parser.parse(new byte[]{0x4, 'h', 'e', 'l', 'l', 'o'});
 
         ExampleClass expected = new ExampleClass("hell");
@@ -81,13 +88,13 @@ class ClassParserTest {
             @Getter
             private String field1;
         }
-        ClassParserBuilder<ExampleClass> parserBuilder = Shortcuts.classParser();
-        parserBuilder.setBuilder((context)->new ExampleClass());
-        parserBuilder.addField("field1Size", Shortcuts.integer().size(1).build());
-        parserBuilder.addField("field1", Shortcuts.string().setLength((context -> context.getField("field1Size"))).build());
-        parserBuilder.addField("field2", Shortcuts.string().build());
-
-        ClassParser<ExampleClass> parser = parserBuilder.build();
+        ValueGetter<BitArray, ExampleClass> builder = (array)->new ExampleClass();
+        List<Pair<String, Parser>> fields = Lists.newArrayList(
+                new Pair<>("field1Size", Shortcuts.integer().size(1).build()),
+                new Pair<>("field1", Shortcuts.string().setLength((context -> context.getField("field1Size"))).build()),
+                new Pair<>("field2", Shortcuts.string().build())
+        );
+        ClassParser<ExampleClass> parser = new ClassParser<>(builder, fields);
         ExampleClass actual = parser.parse(new byte[]{0x4, 'h', 'e', 'l', 'l', 'o'});
 
         ExampleClass expected = new ExampleClass("o", "hell");
