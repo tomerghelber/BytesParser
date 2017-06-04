@@ -34,6 +34,6 @@ public class IntegerParser implements Parser<BitArray, Integer> {
 
     @Override
     public Integer parse(byte[] source) {
-        return parse(new BytesContext<>(source));
+        return parse(new BytesContext(source));
     }
 }

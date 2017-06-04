@@ -38,6 +38,6 @@ public class StringParser implements Parser<BitArray, String> {
 
     @Override
     public String parse(byte[] source) {
-        return parse(new BytesContext<>(source));
+        return parse(new BytesContext(source));
     }
 }

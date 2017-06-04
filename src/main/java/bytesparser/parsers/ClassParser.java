@@ -53,6 +53,6 @@ public class ClassParser<T> implements Parser<BitArray, T> {
 
     @Override
     public T parse(byte[] source) {
-        return parse(new BytesContext<T>(source));
+        return parse(new BytesContext(source));
     }
 }

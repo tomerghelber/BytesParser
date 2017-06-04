@@ -29,6 +29,6 @@ public class BytesParser implements Parser<BitArray, byte[]> {
 
     @Override
     public byte[] parse(byte[] source) {
-        return parse(new BytesContext<>(source));
+        return parse(new BytesContext(source));
     }
 }

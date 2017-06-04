@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by tomer on 4/20/17.
  */
-public class BytesContext<S> extends AbstractContext<BitArray> {
+public class BytesContext extends AbstractContext<BitArray> {
 
     /* --- Members --- */
 
