@@ -6,17 +6,26 @@ import bytesparser.parsers.Parser;
 import bytesparser.valuegetters.ValueGetter;
 import com.google.common.collect.Lists;
 import javafx.util.Pair;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
+
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * @author tomer
  * @since 5/30/17
  */
+@AllArgsConstructor(access = PRIVATE)
 public class ClassParserBuilder<T> implements ParserBuilder<BitArray, T> {
 
-    ValueGetter<BitArray, T> builder=null;
-    List<Pair<String, Parser>> fields = Lists.newArrayListWithCapacity(5);
+    private ValueGetter<BitArray, T> builder;
+
+    private final List<Pair<String, Parser>> fields;
+
+    public ClassParserBuilder() {
+        this(null,  Lists.newArrayList());
+    }
 
     @Override
     public ClassParser<T> build() {
