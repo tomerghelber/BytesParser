@@ -68,7 +68,7 @@ class ClassParserTest {
         ValueGetter<BitArray, ExampleClass> builder = (array)->new ExampleClass();
         List<Pair<String, Parser>> fields = Lists.newArrayList(
                 new Pair<>("field1Size", Shortcuts.integer().size(1).build()),
-                new Pair<>("field1", Shortcuts.string().setLength((context -> context.getField("field1Size"))).build())
+                new Pair<>("field1", Shortcuts.string().setLength(Shortcuts.byField("field1Size")).build())
         );
         ClassParser<ExampleClass> parser = new ClassParser<>(builder, fields);
 
@@ -91,7 +91,7 @@ class ClassParserTest {
         ValueGetter<BitArray, ExampleClass> builder = (array)->new ExampleClass();
         List<Pair<String, Parser>> fields = Lists.newArrayList(
                 new Pair<>("field1Size", Shortcuts.integer().size(1).build()),
-                new Pair<>("field1", Shortcuts.string().setLength((context -> context.getField("field1Size"))).build()),
+                new Pair<>("field1", Shortcuts.string().setLength(Shortcuts.byField("field1Size")).build()),
                 new Pair<>("field2", Shortcuts.string().build())
         );
         ClassParser<ExampleClass> parser = new ClassParser<>(builder, fields);
