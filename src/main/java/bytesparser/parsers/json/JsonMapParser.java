@@ -17,7 +17,7 @@ import static bytesparser.parsers.json.JsonListParser.EMPTY_ITEM_ERROR;
  * @since 6/4/17
  */
 @RequiredArgsConstructor
-public class JsonMapParser implements Parser<BitArray, Map> {
+public class JsonMapParser<Key, Value> implements Parser<BitArray, Map<Key, Value>> {
 
     public static final String EMPTY_KEY_ERROR = "Found an empty key";
     public static final String EMPTY_VALUE_ERROR = "Found an empty value";
@@ -25,8 +25,8 @@ public class JsonMapParser implements Parser<BitArray, Map> {
     private final Parser<BitArray, Object> superParser;
 
     @Override
-    public Map parse(Context<BitArray> context) {
-        Map map = Maps.newHashMap();
+    public Map<Key, Value> parse(Context<BitArray> context) {
+        Map<Key, Value> map = Maps.newHashMap();
         byte last = context.getData(8).toBytes()[0];
         Preconditions.checkState(last == '{');
         last = context.peekData(8).toBytes()[0];
@@ -38,7 +38,7 @@ public class JsonMapParser implements Parser<BitArray, Map> {
                 Preconditions.checkState(context.peekData(8).toBytes()[0] != '}', EMPTY_ITEM_ERROR);
                 Preconditions.checkState(context.peekData(8).toBytes()[0] != ',', EMPTY_ITEM_ERROR);
                 Preconditions.checkState(context.peekData(8).toBytes()[0] != ':', EMPTY_KEY_ERROR);
-                Object key = superParser.parse(context);
+                Key key = (Key) superParser.parse(context);
 
                 while ((last = context.getData(8).toBytes()[0]) == ' ') ;
                 Preconditions.checkState(last == ':');
@@ -48,7 +48,7 @@ public class JsonMapParser implements Parser<BitArray, Map> {
                 }
                 Preconditions.checkState(context.peekData(8).toBytes()[0] != ',', EMPTY_VALUE_ERROR);
                 Preconditions.checkState(context.peekData(8).toBytes()[0] != '}', EMPTY_VALUE_ERROR);
-                Object value = superParser.parse(context);
+                Value value = (Value) superParser.parse(context);
                 while ((last = context.getData(8).toBytes()[0]) == ' ') ;
                 map.put(key, value);
             } while (last == ',');
@@ -58,7 +58,7 @@ public class JsonMapParser implements Parser<BitArray, Map> {
     }
 
     @Override
-    public Map parse(byte[] source) {
+    public Map<Key, Value> parse(byte[] source) {
         return parse(new BytesContext(source));
     }
 }

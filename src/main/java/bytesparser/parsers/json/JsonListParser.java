@@ -15,15 +15,15 @@ import java.util.List;
  * @since 6/4/17
  */
 @RequiredArgsConstructor
-public class JsonListParser implements Parser<BitArray, List> {
+public class JsonListParser<Item> implements Parser<BitArray, List<Item>> {
 
     public static final String EMPTY_ITEM_ERROR = "Found an empty item";
 
     private final Parser<BitArray, Object> superParser;
 
     @Override
-    public List parse(Context<BitArray> context) {
-        List<Object> list = Lists.newArrayList();
+    public List<Item> parse(Context<BitArray> context) {
+        List<Item> list = Lists.newArrayList();
         byte last = context.getData(8).toBytes()[0];
         Preconditions.checkState(last == '[');
         last = context.peekData(8).toBytes()[0];
@@ -34,7 +34,7 @@ public class JsonListParser implements Parser<BitArray, List> {
                 }
                 Preconditions.checkState(context.peekData(8).toBytes()[0] != ',', EMPTY_ITEM_ERROR);
                 Preconditions.checkState(context.peekData(8).toBytes()[0] != ']', EMPTY_ITEM_ERROR);
-                list.add(superParser.parse(context));
+                list.add((Item) superParser.parse(context));
                 while ((context.peekData(8).toBytes()[0]) == ' ') {
                     context.getData(8);
                 }
@@ -46,7 +46,7 @@ public class JsonListParser implements Parser<BitArray, List> {
     }
 
     @Override
-    public List parse(byte[] source) {
+    public List<Item> parse(byte[] source) {
         return parse(new BytesContext(source));
     }
 }
