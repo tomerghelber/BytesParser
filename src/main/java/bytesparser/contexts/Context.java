@@ -13,5 +13,7 @@ public interface Context<S> {
 
     S getData(int size);
 
+    S peekData(int size);
+
     int getRemand();
 }

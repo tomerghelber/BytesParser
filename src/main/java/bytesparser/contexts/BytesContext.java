@@ -27,9 +27,14 @@ public class BytesContext extends AbstractContext<BitArray> {
 
     @Override
     public BitArray getData(int size) {
-        BitArray ret = getSource().cut(size);
+        BitArray ret = peekData(size);
         setSource(getSource().cut(size, getSource().size()));
         return ret;
+    }
+
+    @Override
+    public BitArray peekData(int size) {
+        return getSource().cut(size);
     }
 
     @Override

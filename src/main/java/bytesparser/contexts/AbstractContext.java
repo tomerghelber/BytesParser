@@ -1,12 +1,8 @@
 package bytesparser.contexts;
 
-import bits.array.BitArray;
-import bits.array.simples.BytesAsBitArray;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,8 +39,4 @@ public abstract class AbstractContext<S> implements Context<S> {
         }
         fields.put(fieldName, fieldValue);
     }
-
-    public abstract S getData(int size);
-
-    public abstract int getRemand();
 }
