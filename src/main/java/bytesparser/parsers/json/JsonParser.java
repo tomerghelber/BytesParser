@@ -30,7 +30,7 @@ public class JsonParser implements Parser<BitArray, Object> {
 
     private Parser<BitArray, List> listParser;
 
-    private Parser<BitArray, Double> numberParser;
+    private Parser<BitArray, Number> numberParser;
 
     public static char getAfterWhitespaces(Context<BitArray> context) {
         char last;
