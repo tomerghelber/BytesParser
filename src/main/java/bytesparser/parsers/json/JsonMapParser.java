@@ -37,28 +37,26 @@ public class JsonMapParser<Value> implements Parser<BitArray, Map<String, Value>
         char last = getChar(context);
         Preconditions.checkState(last == MAP_START);
         last = peekChar(context);
-        if (last != MAP_END) {
-            do {
-                last = skipWhitespaces(context);
-                Preconditions.checkState(last != MAP_END, EMPTY_ITEM_ERROR);
-                Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_ITEM_ERROR);
-                Preconditions.checkState(last != MAP_VALUE_SEPARATOR, EMPTY_KEY_ERROR);
-                String key = stringParser.parse(context);
+        while (last != MAP_END) {
+            last = skipWhitespaces(context);
+            Preconditions.checkState(last != MAP_END, EMPTY_ITEM_ERROR);
+            Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_ITEM_ERROR);
+            Preconditions.checkState(last != MAP_VALUE_SEPARATOR, EMPTY_KEY_ERROR);
+            String key = stringParser.parse(context);
 
-                last = getAfterWhitespaces(context);
-                Preconditions.checkState(last == MAP_VALUE_SEPARATOR);
+            last = getAfterWhitespaces(context);
+            Preconditions.checkState(last == MAP_VALUE_SEPARATOR);
 
-                last = skipWhitespaces(context);
-                Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_VALUE_ERROR);
-                Preconditions.checkState(last != MAP_END, EMPTY_VALUE_ERROR);
-                Value value = (Value) superParser.parse(context);
+            last = skipWhitespaces(context);
+            Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_VALUE_ERROR);
+            Preconditions.checkState(last != MAP_END, EMPTY_VALUE_ERROR);
+            Value value = (Value) superParser.parse(context);
 
-                last = getAfterWhitespaces(context);
+            last = getAfterWhitespaces(context);
 
-                map.put(key, value);
-            } while (last == ITEM_SEPARATOR);
+            map.put(key, value);
+            Preconditions.checkState(last == ITEM_SEPARATOR || last == MAP_END);
         }
-        Preconditions.checkState(last == MAP_END);
         return map.build();
     }
 
