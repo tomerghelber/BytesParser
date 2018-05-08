@@ -22,20 +22,39 @@ public class JsonParser implements Parser<BitArray, Object> {
 
     private Parser<BitArray, List> listParser;
 
-    private Parser<BitArray, Integer> integerParser;
+    private Parser<BitArray, Double> numberParser;
+
+    public static byte getAfterWhitespaces(Context<BitArray> context) {
+        byte last;
+        while ((last = getByte(context)) == ' ');
+        return last;
+    }
+
+    public static byte skipWhitespaces(Context<BitArray> context) {
+        byte last;
+        while ((last = peekByte(context)) == ' ') {
+            getByte(context);
+        }
+        return last;
+    }
+
+    public static byte peekByte(Context<BitArray> context) {
+        return context.peekData(8).toBytes()[0];
+    }
+
+    public static byte getByte(Context<BitArray> context) {
+        return context.getData(8).toBytes()[0];
+    }
 
     @Override
     public Object parse(Context<BitArray> context) {
         initialise();
-        byte last;
-        while ((last = context.peekData(8).toBytes()[0]) == ' ') {
-            context.getData(8);
-        }
+        byte last = skipWhitespaces(context);
         Parser<BitArray, ?> parser = ImmutableMap.of(
                 '"', stringParser,
                 '{', mapParser,
                 '[', listParser
-        ).getOrDefault((char) last, integerParser);
+        ).getOrDefault((char) last, numberParser);
         return parser.parse(context);
     }
 
@@ -44,13 +63,13 @@ public class JsonParser implements Parser<BitArray, Object> {
             stringParser = new JsonStringParser();
         }
         if (mapParser == null) {
-            mapParser = new JsonMapParser(this);
+            mapParser = new JsonMapParser(this, stringParser);
         }
         if (listParser == null) {
             listParser = new JsonListParser(this);
         }
-        if (integerParser == null) {
-            integerParser = new JsonIntegerParser();
+        if (numberParser == null) {
+            numberParser = new JsonNumberParser();
         }
     }
 
