@@ -33,16 +33,14 @@ public class JsonListParser<Item> implements Parser<BitArray, List<Item>> {
         char last = getChar(context);
         Preconditions.checkState(last == LIST_START);
         last = peekChar(context);
-        if (last != LIST_END) {
-            do {
-                last = skipWhitespaces(context);
-                Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_ITEM_ERROR);
-                Preconditions.checkState(last != LIST_START, EMPTY_ITEM_ERROR);
-                list.add((Item) superParser.parse(context));
-                last = getAfterWhitespaces(context);
-            } while (last == ITEM_SEPARATOR);
+        while (last != LIST_END) {
+            last = skipWhitespaces(context);
+            Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_ITEM_ERROR);
+            Preconditions.checkState(last != LIST_START, EMPTY_ITEM_ERROR);
+            list.add((Item) superParser.parse(context));
+            last = getAfterWhitespaces(context);
+            Preconditions.checkState(last == ITEM_SEPARATOR || last == LIST_END);
         }
-        Preconditions.checkState(last == LIST_END);
         return list.build();
     }
 

@@ -29,7 +29,7 @@ public class JsonListParserTest {
 
     @Test
     void testJsonWithList() {
-        assertEquals(ImmutableList.of(1234.0, "1234"), jsonParser.parse("[1234, \"1234\"]".getBytes()));
+        assertEquals(ImmutableList.of(1234, "1234"), jsonParser.parse("[1234, \"1234\"]".getBytes()));
     }
 
     @Test
