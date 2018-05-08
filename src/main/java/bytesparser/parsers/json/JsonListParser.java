@@ -21,24 +21,28 @@ public class JsonListParser<Item> implements Parser<BitArray, List<Item>> {
 
     public static final String EMPTY_ITEM_ERROR = "Found an empty item";
 
+    public static final char LIST_START = '[';
+    public static final char LIST_END = ']';
+    public static final char ITEM_SEPARATOR = ',';
+
     private final Parser<BitArray, Object> superParser;
 
     @Override
     public List<Item> parse(Context<BitArray> context) {
         ImmutableList.Builder<Item> list = ImmutableList.builder();
         char last = getChar(context);
-        Preconditions.checkState(last == '[');
+        Preconditions.checkState(last == LIST_START);
         last = peekChar(context);
-        if (last != ']') {
+        if (last != LIST_END) {
             do {
                 last = skipWhitespaces(context);
-                Preconditions.checkState(last != ',', EMPTY_ITEM_ERROR);
-                Preconditions.checkState(last != ']', EMPTY_ITEM_ERROR);
+                Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_ITEM_ERROR);
+                Preconditions.checkState(last != LIST_START, EMPTY_ITEM_ERROR);
                 list.add((Item) superParser.parse(context));
                 last = getAfterWhitespaces(context);
-            } while (last == ',');
+            } while (last == ITEM_SEPARATOR);
         }
-        Preconditions.checkState(last == ']');
+        Preconditions.checkState(last == LIST_END);
         return list.build();
     }
 

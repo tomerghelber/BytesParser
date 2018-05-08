@@ -6,6 +6,7 @@ import bytesparser.contexts.Context;
 import bytesparser.parsers.Parser;
 import com.google.common.base.Preconditions;
 
+import static bytesparser.parsers.json.JsonParser.JSON_ESCAPING;
 import static bytesparser.parsers.json.JsonParser.getChar;
 
 /**
@@ -13,13 +14,17 @@ import static bytesparser.parsers.json.JsonParser.getChar;
  * @since 6/4/17
  */
 public class JsonStringParser implements Parser<BitArray, String> {
+
+    public static final char STRING_START = '"';
+    public static final char STRING_END = STRING_START;
+
     @Override
     public String parse(Context<BitArray> context) {
         char last = getChar(context);
-        Preconditions.checkState(last == '"');
+        Preconditions.checkState(last == STRING_START);
         StringBuilder stringBuilder = new StringBuilder();
-        while ((last = getChar(context)) != '"') {
-            if (last == '\\') {
+        while ((last = getChar(context)) != STRING_END) {
+            if (last == JSON_ESCAPING) {
                 last = getChar(context);
                 stringBuilder.append(last);
             } else {
