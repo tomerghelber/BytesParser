@@ -5,10 +5,12 @@ import bytesparser.contexts.BytesContext;
 import bytesparser.contexts.Context;
 import bytesparser.parsers.Parser;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+
+import static bytesparser.parsers.json.JsonParser.*;
 
 /**
  * @author tomer
@@ -23,26 +25,21 @@ public class JsonListParser<Item> implements Parser<BitArray, List<Item>> {
 
     @Override
     public List<Item> parse(Context<BitArray> context) {
-        List<Item> list = Lists.newArrayList();
+        ImmutableList.Builder<Item> list = ImmutableList.builder();
         byte last = context.getData(8).toBytes()[0];
         Preconditions.checkState(last == '[');
-        last = context.peekData(8).toBytes()[0];
+        last = peekByte(context);
         if (last != ']') {
             do {
-                while ((context.peekData(8).toBytes()[0]) == ' ') {
-                    context.getData(8);
-                }
-                Preconditions.checkState(context.peekData(8).toBytes()[0] != ',', EMPTY_ITEM_ERROR);
-                Preconditions.checkState(context.peekData(8).toBytes()[0] != ']', EMPTY_ITEM_ERROR);
+                last = skipWhitespaces(context);
+                Preconditions.checkState(last != ',', EMPTY_ITEM_ERROR);
+                Preconditions.checkState(last != ']', EMPTY_ITEM_ERROR);
                 list.add((Item) superParser.parse(context));
-                while ((context.peekData(8).toBytes()[0]) == ' ') {
-                    context.getData(8);
-                }
-                last = context.getData(8).toBytes()[0];
+                last = getAfterWhitespaces(context);
             } while (last == ',');
         }
         Preconditions.checkState(last == ']');
-        return list;
+        return list.build();
     }
 
     @Override
