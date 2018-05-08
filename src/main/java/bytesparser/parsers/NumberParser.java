@@ -18,17 +18,18 @@ public class NumberParser implements Parser<BitArray, Double> {
     @Override
         public Double parse(Context<BitArray> context) {
             char last = getChar(context);
-            Preconditions.checkState(last == '-' || ('0' <= last && last <= '9'));
+            Preconditions.checkState(last == '-' || Character.isDigit(last));
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(last);
-            while (context.getRemand() >= BITS_IN_BYTE && '0' <= (last = peekChar(context)) && last <= '9') {
+            while (context.getRemand() >= BITS_IN_BYTE && Character.isDigit(peekChar(context))) {
                 stringBuilder.append(getChar(context));
             }
             if (context.getRemand() >= BITS_IN_BYTE && '.' == peekChar(context)) {
                 stringBuilder.append(getChar(context));
-            }
-            while (context.getRemand() >= BITS_IN_BYTE && '0' <= (last = peekChar(context)) && last <= '9') {
-                stringBuilder.append(getChar(context));
+                Preconditions.checkState(Character.isDigit(peekChar(context)));
+                while (context.getRemand() >= BITS_IN_BYTE && Character.isDigit(peekChar(context))) {
+                    stringBuilder.append(getChar(context));
+                }
             }
             return Double.parseDouble(stringBuilder.toString());
         }
