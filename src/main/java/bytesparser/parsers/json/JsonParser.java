@@ -3,12 +3,15 @@ package bytesparser.parsers.json;
 import bits.array.BitArray;
 import bytesparser.contexts.BytesContext;
 import bytesparser.contexts.Context;
+import bytesparser.parsers.NumberParser;
 import bytesparser.parsers.Parser;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 import java.util.Map;
+
+import static bits.Bits.BITS_IN_BYTE;
 
 /**
  * @author tomer
@@ -24,37 +27,41 @@ public class JsonParser implements Parser<BitArray, Object> {
 
     private Parser<BitArray, Double> numberParser;
 
-    public static byte getAfterWhitespaces(Context<BitArray> context) {
-        byte last;
-        while ((last = getByte(context)) == ' ');
+    public static char getAfterWhitespaces(Context<BitArray> context) {
+        char last;
+        while ((last = getChar(context)) == ' ');
         return last;
     }
 
-    public static byte skipWhitespaces(Context<BitArray> context) {
-        byte last;
-        while ((last = peekByte(context)) == ' ') {
+    public static char skipWhitespaces(Context<BitArray> context) {
+        char last;
+        while ((last = peekChar(context)) == ' ') {
             getByte(context);
         }
         return last;
     }
 
-    public static byte peekByte(Context<BitArray> context) {
-        return context.peekData(8).toBytes()[0];
+    public static char peekChar(Context<BitArray> context) {
+        return (char) context.peekData(BITS_IN_BYTE).toBytes()[0];
     }
 
-    public static byte getByte(Context<BitArray> context) {
-        return context.getData(8).toBytes()[0];
+    private static byte getByte(Context<BitArray> context) {
+        return context.getData(BITS_IN_BYTE).toBytes()[0];
+    }
+
+    public static char getChar(Context<BitArray> context) {
+        return (char) getByte(context);
     }
 
     @Override
     public Object parse(Context<BitArray> context) {
         initialise();
-        byte last = skipWhitespaces(context);
+        char last = skipWhitespaces(context);
         Parser<BitArray, ?> parser = ImmutableMap.of(
                 '"', stringParser,
                 '{', mapParser,
                 '[', listParser
-        ).getOrDefault((char) last, numberParser);
+        ).getOrDefault(last, numberParser);
         return parser.parse(context);
     }
 
@@ -69,7 +76,7 @@ public class JsonParser implements Parser<BitArray, Object> {
             listParser = new JsonListParser(this);
         }
         if (numberParser == null) {
-            numberParser = new JsonNumberParser();
+            numberParser = new NumberParser();
         }
     }
 
@@ -77,7 +84,7 @@ public class JsonParser implements Parser<BitArray, Object> {
     public Object parse(byte[] source) {
         Context<BitArray> context = new BytesContext(source);
         Object object = parse(context);
-        while (context.getRemand() > 0 && (context.getData(8).toBytes()[0]) == ' ');
+        while (context.getRemand() > 0 && getChar(context) == ' ');
         Preconditions.checkState(context.getRemand() == 0, "Didn't finished the buffer");
         return object;
     }

@@ -6,6 +6,8 @@ import bytesparser.contexts.Context;
 import bytesparser.parsers.Parser;
 import com.google.common.base.Preconditions;
 
+import static bytesparser.parsers.json.JsonParser.getChar;
+
 /**
  * @author tomer
  * @since 6/4/17
@@ -13,15 +15,15 @@ import com.google.common.base.Preconditions;
 public class JsonStringParser implements Parser<BitArray, String> {
     @Override
     public String parse(Context<BitArray> context) {
-        byte last = context.getData(8).toBytes()[0];
+        char last = getChar(context);
         Preconditions.checkState(last == '"');
         StringBuilder stringBuilder = new StringBuilder();
-        while ((last = context.getData(8).toBytes()[0]) != '"') {
+        while ((last = getChar(context)) != '"') {
             if (last == '\\') {
-                last = context.getData(8).toBytes()[0];
-                stringBuilder.append((char)last);
+                last = getChar(context);
+                stringBuilder.append(last);
             } else {
-                stringBuilder.append((char) last);
+                stringBuilder.append(last);
             }
         }
         return stringBuilder.toString();

@@ -29,9 +29,9 @@ public class JsonMapParser<Value> implements Parser<BitArray, Map<String, Value>
     @Override
     public Map<String, Value> parse(Context<BitArray> context) {
         ImmutableMap.Builder<String, Value> map = ImmutableMap.builder();
-        byte last = getByte(context);
+        char last = getChar(context);
         Preconditions.checkState(last == '{');
-        last = peekByte(context);
+        last = peekChar(context);
         if (last != '}') {
             do {
                 last = skipWhitespaces(context);

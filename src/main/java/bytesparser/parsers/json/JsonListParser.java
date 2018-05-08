@@ -26,9 +26,9 @@ public class JsonListParser<Item> implements Parser<BitArray, List<Item>> {
     @Override
     public List<Item> parse(Context<BitArray> context) {
         ImmutableList.Builder<Item> list = ImmutableList.builder();
-        byte last = context.getData(8).toBytes()[0];
+        char last = getChar(context);
         Preconditions.checkState(last == '[');
-        last = peekByte(context);
+        last = peekChar(context);
         if (last != ']') {
             do {
                 last = skipWhitespaces(context);
