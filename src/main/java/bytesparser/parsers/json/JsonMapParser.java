@@ -1,67 +1,36 @@
 package bytesparser.parsers.json;
 
 import bits.array.BitArray;
-import bytesparser.contexts.BytesContext;
-import bytesparser.contexts.Context;
+import bytesparser.parsers.MapParser;
 import bytesparser.parsers.Parser;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import lombok.RequiredArgsConstructor;
-
-import java.util.Map;
 
 import static bytesparser.parsers.json.JsonListParser.EMPTY_ITEM_ERROR;
 import static bytesparser.parsers.json.JsonListParser.ITEM_SEPARATOR;
-import static bytesparser.parsers.json.JsonParser.*;
+import static bytesparser.parsers.json.JsonParser.skipWhitespaces;
 
 /**
  * @author tomer
  * @since 6/4/17
  */
-@RequiredArgsConstructor
-public class JsonMapParser<Value> implements Parser<BitArray, Map<String, Value>> {
-
-    public static final String EMPTY_KEY_ERROR = "Found an empty key";
-    public static final String EMPTY_VALUE_ERROR = "Found an empty value";
+public class JsonMapParser<Value> extends MapParser<String, Value> {
 
     public static final char MAP_START = '{';
     public static final char MAP_END = '}';
     public static final char MAP_VALUE_SEPARATOR = ':';
 
-    private final Parser<BitArray, Object> superParser;
-    private final Parser<BitArray, String> stringParser;
-
-    @Override
-    public Map<String, Value> parse(Context<BitArray> context) {
-        ImmutableMap.Builder<String, Value> map = ImmutableMap.builder();
-        char last = getChar(context);
-        Preconditions.checkState(last == MAP_START);
-        last = peekChar(context);
-        while (last != MAP_END) {
-            last = skipWhitespaces(context);
+    public JsonMapParser(JsonParser superParser, final Parser<BitArray, String> stringParser) {
+        super(MAP_START, MAP_END, ITEM_SEPARATOR, context->{
+            char last = skipWhitespaces(context);
             Preconditions.checkState(last != MAP_END, EMPTY_ITEM_ERROR);
             Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_ITEM_ERROR);
             Preconditions.checkState(last != MAP_VALUE_SEPARATOR, EMPTY_KEY_ERROR);
-            String key = stringParser.parse(context);
-
-            last = getAfterWhitespaces(context);
-            Preconditions.checkState(last == MAP_VALUE_SEPARATOR);
-
-            last = skipWhitespaces(context);
+            return stringParser.parse(context);
+        }, JsonParser::getAfterWhitespaces, context->{
+            char last = skipWhitespaces(context);
             Preconditions.checkState(last != ITEM_SEPARATOR, EMPTY_VALUE_ERROR);
             Preconditions.checkState(last != MAP_END, EMPTY_VALUE_ERROR);
-            Value value = (Value) superParser.parse(context);
-
-            last = getAfterWhitespaces(context);
-
-            map.put(key, value);
-            Preconditions.checkState(last == ITEM_SEPARATOR || last == MAP_END);
-        }
-        return map.build();
-    }
-
-    @Override
-    public Map<String, Value> parse(byte[] source) {
-        return parse(new BytesContext(source));
+            return (Value) superParser.parse(context);
+        }, JsonParser::getAfterWhitespaces);
     }
 }
