@@ -5,60 +5,60 @@ import bytesparser.contexts.BytesContext;
 import bytesparser.contexts.Context;
 import bytesparser.parsers.Parser;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
 import static bytesparser.parsers.json.JsonListParser.EMPTY_ITEM_ERROR;
+import static bytesparser.parsers.json.JsonParser.*;
 
 /**
  * @author tomer
  * @since 6/4/17
  */
 @RequiredArgsConstructor
-public class JsonMapParser<Key, Value> implements Parser<BitArray, Map<Key, Value>> {
+public class JsonMapParser<Value> implements Parser<BitArray, Map<String, Value>> {
 
     public static final String EMPTY_KEY_ERROR = "Found an empty key";
     public static final String EMPTY_VALUE_ERROR = "Found an empty value";
 
     private final Parser<BitArray, Object> superParser;
+    private final Parser<BitArray, String> stringParser;
 
     @Override
-    public Map<Key, Value> parse(Context<BitArray> context) {
-        Map<Key, Value> map = Maps.newHashMap();
-        byte last = context.getData(8).toBytes()[0];
+    public Map<String, Value> parse(Context<BitArray> context) {
+        ImmutableMap.Builder<String, Value> map = ImmutableMap.builder();
+        byte last = getByte(context);
         Preconditions.checkState(last == '{');
-        last = context.peekData(8).toBytes()[0];
+        last = peekByte(context);
         if (last != '}') {
             do {
-                while ((context.peekData(8).toBytes()[0]) == ' ') {
-                    context.getData(8);
-                }
-                Preconditions.checkState(context.peekData(8).toBytes()[0] != '}', EMPTY_ITEM_ERROR);
-                Preconditions.checkState(context.peekData(8).toBytes()[0] != ',', EMPTY_ITEM_ERROR);
-                Preconditions.checkState(context.peekData(8).toBytes()[0] != ':', EMPTY_KEY_ERROR);
-                Key key = (Key) superParser.parse(context);
+                last = skipWhitespaces(context);
+                Preconditions.checkState(last != '}', EMPTY_ITEM_ERROR);
+                Preconditions.checkState(last != ',', EMPTY_ITEM_ERROR);
+                Preconditions.checkState(last != ':', EMPTY_KEY_ERROR);
+                String key = stringParser.parse(context);
 
-                while ((last = context.getData(8).toBytes()[0]) == ' ') ;
+                last = getAfterWhitespaces(context);
                 Preconditions.checkState(last == ':');
 
-                while ((context.peekData(8).toBytes()[0]) == ' ') {
-                    context.getData(8);
-                }
-                Preconditions.checkState(context.peekData(8).toBytes()[0] != ',', EMPTY_VALUE_ERROR);
-                Preconditions.checkState(context.peekData(8).toBytes()[0] != '}', EMPTY_VALUE_ERROR);
+                last = skipWhitespaces(context);
+                Preconditions.checkState(last != ',', EMPTY_VALUE_ERROR);
+                Preconditions.checkState(last != '}', EMPTY_VALUE_ERROR);
                 Value value = (Value) superParser.parse(context);
-                while ((last = context.getData(8).toBytes()[0]) == ' ') ;
+
+                last = getAfterWhitespaces(context);
+
                 map.put(key, value);
             } while (last == ',');
         }
         Preconditions.checkState(last == '}');
-        return map;
+        return map.build();
     }
 
     @Override
-    public Map<Key, Value> parse(byte[] source) {
+    public Map<String, Value> parse(byte[] source) {
         return parse(new BytesContext(source));
     }
 }
